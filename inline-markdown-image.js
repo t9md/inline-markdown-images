@@ -3,14 +3,7 @@ const Path = require("path")
 const REGEX_IMAGES = /^!\[[^\]\n]*\]\(([^)\n]+)\)$/g
 const REGEX_NETWORK_PATH = /^(?:[a-z]+:)?\/\//i
 
-function buildElement(src) {
-  const div = document.createElement("div")
-  const img = document.createElement("img")
-  img.src = src
-  img.onload = () => (div.style.display = "block")
-  div.appendChild(img)
-  return div
-}
+const isAbsoluteLink = link => REGEX_NETWORK_PATH.test(link) || Path.isAbsolute(link)
 
 module.exports = class InlineMarkdownImage {
   static init() {
@@ -45,13 +38,11 @@ module.exports = class InlineMarkdownImage {
 
       const marker = this.editor.markBufferRange(range, {invalidate: "inside"})
       this.markers.push(marker)
-      const link = match[1]
-      const src =
-        REGEX_NETWORK_PATH.test(link) || Path.isAbsolute(link)
-          ? link
-          : Path.join(Path.dirname(this.editor.getPath()), link)
 
-      this.editor.decorateMarker(marker, {type: "block", item: buildElement(src), position: "after"})
+      const img = document.createElement("img")
+      const link = match[1]
+      img.src = isAbsoluteLink(link) ? link : Path.join(Path.dirname(this.editor.getPath()), link)
+      this.editor.decorateMarker(marker, {type: "block", item: img, position: "after"})
     })
   }
 
