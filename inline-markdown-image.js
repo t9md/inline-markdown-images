@@ -1,6 +1,7 @@
 const {CompositeDisposable} = require("atom")
 const Path = require("path")
-const REGEX_IMAGES = /^!\[[^\]\n]*\]\(([^)\n]+)\)$/g
+
+const REGEX_IMAGES = /!\[.+?\]\((.+?)\)/g
 const REGEX_NETWORK_PATH = /^(?:[a-z]+:)?\/\//i
 
 const isAbsoluteLink = link => REGEX_NETWORK_PATH.test(link) || Path.isAbsolute(link)
@@ -30,11 +31,11 @@ module.exports = class InlineMarkdownImage {
     this.markers.filter(marker => !marker.isValid()).forEach(marker => marker.destroy())
     this.markers = this.markers.filter(marker => !marker.isDestroyed())
 
-    const startRowsOfRenderedImages = this.markers.map(marker => marker.getBufferRange().start.row)
+    const rangesOfRenderedImages = this.markers.map(marker => marker.getBufferRange())
+    const isRendered = range => rangesOfRenderedImages.some(renderedRange => renderedRange.isEqual(range))
 
     this.editor.scan(REGEX_IMAGES, ({range, match}) => {
-      // Skip already rendered link
-      if (startRowsOfRenderedImages.includes(range.start.row)) return
+      if (isRendered(range)) return
 
       const marker = this.editor.markBufferRange(range, {invalidate: "inside"})
       this.markers.push(marker)
@@ -47,6 +48,7 @@ module.exports = class InlineMarkdownImage {
   }
 
   destroy() {
+    this.markers.forEach(marker => marker.destroy())
     this.disposables.dispose()
   }
 }
