@@ -1,10 +1,12 @@
 # Note by t9md [START]
 
-- This is fork project
-- Load minimum code on startup to avoid Atom startup overhead
-- Proper cleanup on deactivation
-- Relax img src detection to allow multiple image on single line or image wrapped by another link(e.g. CI badge image)
-- Remove seem-to-unnecesesary styling: I don't want img centered etc..
+This is fork project, currently no published, just using locally.
+
+- Load minimum code on startup to avoid Atom startup overhead.
+- Render image at bellow of `![]()` link whereas upstream render image at `above` of link.
+- Proper cleanup on deactivation.
+- Relax img link detection to allow multiple image on single line or image wrapped by another link(e.g. CI badge image).
+- Remove seem-to-unnecesesary styling: I don't want img centered etc.
 - Code cleanup
 
 # Note by t9md [END]
